@@ -1,0 +1,94 @@
+{
+  "nav": {
+    "home": { "en": "Home", "ne": "गृहपृष्ठ" },
+    "about": { "en": "About Us", "ne": "हाम्रो बारेमा" },
+    "products": { "en": "Products", "ne": "हाम्रो सामानहरू" },
+    "contact": { "en": "Contact Us", "ne": "सम्पर्क पृष्ठ" }
+  },
+  "buttons":{
+    "call":{ 
+    "en": "Call Now", "ne": "फोन गर्नुहोस्" 
+    },
+    "about":{ 
+      "en": "About Us", "ne": "हाम्रो बारेमा" 
+    }
+  },
+  "members": {
+    "eyebrow": { "en": "MEET THE TEAM", "ne": "टोली भेट्नुहोस्" },
+    "title": { "en": "OUR MEMBERS", "ne": "हाम्रा सदस्यहरू" }
+  },
+  "actions": {
+    "mainNav": { "en": "Main navigation", "ne": "मुख्य नेभिगेसन" },
+    "switchLanguage": {
+      "en": "Switch language",
+      "ne": "भाषा परिवर्तन गर्नुहोस्"
+    },
+    "switchTheme": {
+      "en": "Switch theme",
+      "ne": "थीम परिवर्तन गर्नुहोस्"
+    }
+  },
+  "hero": {
+    "eyebrow": {
+      "en": "Pashupati Plasto Nepal",
+      "ne": "पशुपति प्लास्टो नेपाल"
+    },
+    "title": {
+      "en": "Plastic & polymer items, made in Nepal.",
+      "ne": "प्लास्टिक र पोलिमर सामग्री, नेपालमा निर्मित।"
+    },
+    "subtitle": {
+      "en": "Pashupati Plasto Nepal supplies dependable plastic products to homes and industry across Nepal.",
+      "ne": "पशुपति प्लास्टो नेपालले नेपालभरका घर तथा उद्योगहरूमा भरपर्दो प्लास्टिक उत्पादनहरू आपूर्ति गर्छ।"
+    },
+    "imageAlt": {
+      "en": "Pashupati Plasto Nepal manufacturing operations in Bhaktapur",
+      "ne": "भक्तपुरमा पशुपति प्लास्टो नेपालको उत्पादन कार्य"
+    }
+  },
+  "sections": {
+    "about": {
+      "label": { "en": "About Us", "ne": "हाम्रो बारेमा" },
+      "body": {
+        "en": "A registered plastic and polymer business serving Bhaktapur and the wider Bagmati region.",
+        "ne": "भक्तपुर र वरपरको बागमती क्षेत्रमा सेवा दिने दर्ता भएको प्लास्टिक तथा पोलिमर व्यवसाय।"
+      }
+    },
+    "products": {
+      "label": { "en": "Our Products", "ne": "हाम्रो सामानहरू" },
+      "body": {
+        "en": "Household, industrial, and custom-moulded plastic goods manufactured to Nepali standards.",
+        "ne": "नेपाली मापदण्ड अनुसार निर्मित घरायसी, औद्योगिक र अनुकूलित ढाँचाका प्लासटिक सामानहरू।"
+      }
+    },
+    "contact": {
+      "label": { "en": "Contact Us", "ne": "हामीलाई सम्पर्क गर्नुहोस्" },
+      "body": {
+        "en": "Get in touch with us for inquiries, quotes, or to discuss your plastic product needs.",
+        "ne": "मूल्य जान्न, जानकारी लिन वा तपाईंको प्लास्टिक उत्पादन आवश्यकताहरू छलफल गर्न हामीसँग सम्पर्क गर्नुहोस्।"
+      }
+    }
+  },
+  "contact": {
+    "name": { "en": "Name", "ne": "नाम" },
+    "email": { "en": "Email", "ne": "इमेल" },
+    "phone": { "en": "Phone", "ne": "फोन नम्बर" },
+    "message": { "en": "Message", "ne": "सन्देश" },
+    "namePlaceholder": { "en": "Your name", "ne": "तपाईंको नाम" },
+    "emailPlaceholder": { "en": "your@email.com", "ne": "your@email.com" },
+    "phonePlaceholder": { "en": "98XXXXXXXX", "ne": "९८XXXXXXXX" },
+    "messagePlaceholder": { "en": "Your message...", "ne": "तपाईंको सन्देश..." },
+    "send": { "en": "Send Message", "ne": "सन्देश पठाउनुहोस्" }
+  },
+  "business": {
+    "location": {
+      "en": "Suryabinayak-2, Bhaktapur",
+      "ne": "सूर्यविनायक-२, भक्तपुर"
+    },
+    "region": {
+      "en": "Bagmati Province, Nepal",
+      "ne": "बागमती प्रदेश, नेपाल"
+    }
+  }
+  
+}
