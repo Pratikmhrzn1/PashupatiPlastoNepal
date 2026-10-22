@@ -1,13 +1,13 @@
-import { motion } from "framer-motion";
-import { staggerGroup } from "./variants";
-import HeroContent from "./HeroContent";
-import HeroMedia from "./HeroMedia";
+import { motion } from "framer-motion"
+import { staggerGroup } from "./variants"
+import HeroContent from "./HeroContent"
+import HeroMedia from "./HeroMedia"
 
 export default function Hero() {
   return (
     <section
       id="home"
-      className="relative flex min-h-svh items-center overflow-hidden pt-28 pb-20 sm:pt-32 sm:pb-16"
+      className="relative flex items-center overflow-hidden pt-28 pb-20 sm:pt-32 sm:pb-16"
     >
       <motion.div
         initial="hidden"
@@ -19,5 +19,5 @@ export default function Hero() {
         <HeroMedia />
       </motion.div>
     </section>
-  );
+  )
 }

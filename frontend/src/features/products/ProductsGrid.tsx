@@ -1,10 +1,10 @@
-import ProductCard from "./ProductCard";
-import type { Product } from "../../constants/products";
-import { motion } from "framer-motion";
-import { useReducedMotion } from "framer-motion";
+import ProductCard from "./ProductCard"
+import type { ProductDto } from "@/services/types"
+import { motion } from "framer-motion"
+import { useReducedMotion } from "framer-motion"
 
 interface ProductsGridProps {
-  products: Product[];
+  products: ProductDto[]
 }
 
 const stagger = {
@@ -15,7 +15,7 @@ const stagger = {
   exit: {
     transition: { staggerChildren: 0.03, staggerDirection: -1 },
   },
-};
+}
 
 const fadeUp = {
   hidden: { opacity: 0, y: 12, filter: "blur(4px)" },
@@ -31,10 +31,10 @@ const fadeUp = {
     filter: "blur(4px)",
     transition: { duration: 0.15, ease: "easeOut" as const },
   },
-};
+}
 
 export default function ProductsGrid({ products }: ProductsGridProps) {
-  const reduceMotion = useReducedMotion();
+  const reduceMotion = useReducedMotion()
 
   const variants = reduceMotion
     ? {
@@ -42,7 +42,7 @@ export default function ProductsGrid({ products }: ProductsGridProps) {
         visible: { opacity: 1, transition: { staggerChildren: 0.04 } },
         exit: { opacity: 0, transition: { duration: 0.1 } },
       }
-    : stagger;
+    : stagger
 
   const itemVariants = reduceMotion
     ? {
@@ -50,7 +50,7 @@ export default function ProductsGrid({ products }: ProductsGridProps) {
         visible: { opacity: 1, transition: { duration: 0.2 } },
         exit: { opacity: 0, transition: { duration: 0.1 } },
       }
-    : fadeUp;
+    : fadeUp
 
   return (
     <motion.div
@@ -66,5 +66,5 @@ export default function ProductsGrid({ products }: ProductsGridProps) {
         </motion.div>
       ))}
     </motion.div>
-  );
+  )
 }

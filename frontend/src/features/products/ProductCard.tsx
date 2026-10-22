@@ -1,4 +1,6 @@
 import { motion } from "framer-motion";
+import { FiTrendingUp } from "react-icons/fi";
+import { useLanguage } from "@/i18n/useLanguage";
 
 export interface ProductCardProps {
   id: string;
@@ -6,6 +8,7 @@ export interface ProductCardProps {
   price: string;
   description: string;
   image?: string;
+  soldCount?: number;
 }
 
 export default function ProductCard({
@@ -13,26 +16,30 @@ export default function ProductCard({
   price,
   description,
   image,
+  soldCount,
 }: ProductCardProps) {
+  const { t, lang } = useLanguage();
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 12 }}
       animate={{ opacity: 1, y: 0 }}
-      whileTap={{ scale: 0.995 }}
       whileHover={{ y: -2, scale: 1.002 }}
       transition={{
         type: "spring",
         bounce: 0,
         duration: 0.4,
       }}
-      className="group flex h-full flex-col overflow-hidden rounded-2xl border border-charcoal-800/10 bg-surface/95 shadow-sm backdrop-blur transition-shadow will-change-transform focus-within:shadow-md hover:shadow-md dark:border-white/10 dark:hover:shadow-[0_8px_24px_-16px_rgba(0,0,0,0.8)]"
+      className="group flex h-full flex-col overflow-hidden rounded-2xl border border-charcoal-800/10 bg-surface/95 shadow-sm backdrop-blur transition-shadow focus-within:shadow-md hover:shadow-md dark:border-white/10 dark:hover:shadow-[0_8px_24px_-16px_rgba(0,0,0,0.8)]"
     >
       <div className="relative aspect-[4/3] w-full overflow-hidden bg-charcoal-100 dark:bg-white/[0.06]">
         {image ? (
           <motion.img
             src={image}
             alt={name}
-            className="h-full w-full object-cover object-center will-change-transform"
+            loading="lazy"
+            decoding="async"
+            className="h-full w-full object-cover object-center"
             whileHover={{ scale: 1.04 }}
             transition={{ type: "spring", bounce: 0, duration: 0.4 }}
           />
@@ -68,6 +75,12 @@ export default function ProductCard({
         <p className="mt-2 flex-1 text-pretty text-sm leading-relaxed text-ink-muted">
           {description}
         </p>
+        {typeof soldCount === "number" && (
+          <p className="mt-4 flex items-center gap-1.5 text-xs font-semibold text-ink-muted">
+            <FiTrendingUp aria-hidden="true" size={14} strokeWidth={2} />
+            {`${soldCount.toLocaleString(lang === "ne" ? "ne-NP" : "en-US")}+ ${t("sections.products.sold")}`}
+          </p>
+        )}
       </div>
     </motion.div>
   );

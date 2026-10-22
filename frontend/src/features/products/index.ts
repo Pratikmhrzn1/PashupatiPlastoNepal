@@ -1,2 +1,6 @@
-export { default as ProductCard } from "./ProductCard";
-export { default as ProductsGrid } from "./ProductsGrid";
+export { default as ProductCard } from "./ProductCard"
+export { default as ProductsGrid } from "./ProductsGrid"
+export { default as FeaturedProducts } from "./FeaturedProducts"
+export { useProducts } from "./useProducts"
+export { useFeaturedProducts } from "./useFeaturedProducts"
+export { productKeys, fetchProducts, fetchFeaturedProducts } from "./api"

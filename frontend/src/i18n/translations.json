@@ -1,24 +1,47 @@
 {
   "nav": {
-    "home": { "en": "Home", "ne": "गृहपृष्ठ" },
-    "about": { "en": "About Us", "ne": "हाम्रो बारेमा" },
-    "products": { "en": "Products", "ne": "हाम्रो सामानहरू" },
-    "contact": { "en": "Contact Us", "ne": "सम्पर्क पृष्ठ" }
-  },
-  "buttons":{
-    "call":{ 
-    "en": "Call Now", "ne": "फोन गर्नुहोस्" 
+    "home": {
+      "en": "Home",
+      "ne": "गृहपृष्ठ"
     },
-    "about":{ 
-      "en": "About Us", "ne": "हाम्रो बारेमा" 
+    "about": {
+      "en": "About Us",
+      "ne": "हाम्रो बारेमा"
+    },
+    "products": {
+      "en": "Products",
+      "ne": "हाम्रो सामानहरू"
+    },
+    "contact": {
+      "en": "Contact Us",
+      "ne": "सम्पर्क पृष्ठ"
+    }
+  },
+  "buttons": {
+    "call": {
+      "en": "Call Now",
+      "ne": "फोन गर्नुहोस्"
+    },
+    "about": {
+      "en": "About Us",
+      "ne": "हाम्रो बारेमा"
     }
   },
   "members": {
-    "eyebrow": { "en": "MEET THE TEAM", "ne": "टोली भेट्नुहोस्" },
-    "title": { "en": "OUR MEMBERS", "ne": "हाम्रा सदस्यहरू" }
+    "eyebrow": {
+      "en": "MEET THE TEAM",
+      "ne": "टोली भेट्नुहोस्"
+    },
+    "title": {
+      "en": "OUR MEMBERS",
+      "ne": "हाम्रा सदस्यहरू"
+    }
   },
   "actions": {
-    "mainNav": { "en": "Main navigation", "ne": "मुख्य नेभिगेसन" },
+    "mainNav": {
+      "en": "Main navigation",
+      "ne": "मुख्य नेभिगेसन"
+    },
     "switchLanguage": {
       "en": "Switch language",
       "ne": "भाषा परिवर्तन गर्नुहोस्"
@@ -48,37 +71,115 @@
   },
   "sections": {
     "about": {
-      "label": { "en": "About Us", "ne": "हाम्रो बारेमा" },
+      "label": {
+        "en": "About Us",
+        "ne": "हाम्रो बारेमा"
+      },
       "body": {
         "en": "A registered plastic and polymer business serving Bhaktapur and the wider Bagmati region.",
         "ne": "भक्तपुर र वरपरको बागमती क्षेत्रमा सेवा दिने दर्ता भएको प्लास्टिक तथा पोलिमर व्यवसाय।"
       }
     },
     "products": {
-      "label": { "en": "Our Products", "ne": "हाम्रो सामानहरू" },
+      "label": {
+        "en": "Our Products",
+        "ne": "हाम्रो सामानहरू"
+      },
       "body": {
         "en": "Household, industrial, and custom-moulded plastic goods manufactured to Nepali standards.",
         "ne": "नेपाली मापदण्ड अनुसार निर्मित घरायसी, औद्योगिक र अनुकूलित ढाँचाका प्लासटिक सामानहरू।"
+      },
+      "sold": {
+        "en": "sold",
+        "ne": "बिक्री"
+      }
+    },
+    "featured": {
+      "eyebrow": {
+        "en": "Best Sellers",
+        "ne": "सबैभन्दा बढी बिक्री"
+      },
+      "label": {
+        "en": "Featured Products",
+        "ne": "विशेष उत्पादनहरू"
+      },
+      "body": {
+        "en": "The products our customers buy the most.",
+        "ne": "ग्राहकहरूले सबैभन्दा बढी किनेका उत्पादनहरू।"
+      },
+      "cta": {
+        "en": "View all products",
+        "ne": "सबै उत्पादनहरू हेर्नुहोस्"
       }
     },
     "contact": {
-      "label": { "en": "Contact Us", "ne": "हामीलाई सम्पर्क गर्नुहोस्" },
+      "label": {
+        "en": "Contact Us",
+        "ne": "हामीलाई सम्पर्क गर्नुहोस्"
+      },
       "body": {
         "en": "Get in touch with us for inquiries, quotes, or to discuss your plastic product needs.",
         "ne": "मूल्य जान्न, जानकारी लिन वा तपाईंको प्लास्टिक उत्पादन आवश्यकताहरू छलफल गर्न हामीसँग सम्पर्क गर्नुहोस्।"
       }
+    },
+    "notFound": {
+      "label": {
+        "en": "Page not found",
+        "ne": "पृष्ठ भेटिएन"
+      },
+      "body": {
+        "en": "The page you are looking for does not exist or has been moved.",
+        "ne": "तपाईंले खोजेको पृष्ठ अवस्थित छैन वा सारिएको छ।"
+      }
+    },
+    "error": {
+      "label": {
+        "en": "Something went wrong",
+        "ne": "केही गलत भयो"
+      },
+      "body": {
+        "en": "An unexpected error occurred. Please try again.",
+        "ne": "अप्रत्याशित त्रुटि भयो। कृपया फेरि प्रयास गर्नुहोस्।"
+      }
     }
   },
   "contact": {
-    "name": { "en": "Name", "ne": "नाम" },
-    "email": { "en": "Email", "ne": "इमेल" },
-    "phone": { "en": "Phone", "ne": "फोन नम्बर" },
-    "message": { "en": "Message", "ne": "सन्देश" },
-    "namePlaceholder": { "en": "Your name", "ne": "तपाईंको नाम" },
-    "emailPlaceholder": { "en": "your@email.com", "ne": "your@email.com" },
-    "phonePlaceholder": { "en": "98XXXXXXXX", "ne": "९८XXXXXXXX" },
-    "messagePlaceholder": { "en": "Your message...", "ne": "तपाईंको सन्देश..." },
-    "send": { "en": "Send Message", "ne": "सन्देश पठाउनुहोस्" }
+    "name": {
+      "en": "Name",
+      "ne": "नाम"
+    },
+    "email": {
+      "en": "Email",
+      "ne": "इमेल"
+    },
+    "phone": {
+      "en": "Phone",
+      "ne": "फोन नम्बर"
+    },
+    "message": {
+      "en": "Message",
+      "ne": "सन्देश"
+    },
+    "namePlaceholder": {
+      "en": "Your name",
+      "ne": "तपाईंको नाम"
+    },
+    "emailPlaceholder": {
+      "en": "your@email.com",
+      "ne": "your@email.com"
+    },
+    "phonePlaceholder": {
+      "en": "98XXXXXXXX",
+      "ne": "९८XXXXXXXX"
+    },
+    "messagePlaceholder": {
+      "en": "Your message...",
+      "ne": "तपाईंको सन्देश..."
+    },
+    "send": {
+      "en": "Send Message",
+      "ne": "सन्देश पठाउनुहोस्"
+    }
   },
   "business": {
     "location": {
@@ -89,6 +190,73 @@
       "en": "Bagmati Province, Nepal",
       "ne": "बागमती प्रदेश, नेपाल"
     }
+  },
+  "location": {
+    "eyebrow": {
+      "en": "VISIT THE FACTORY",
+      "ne": "कारखानामा आउनुहोस्"
+    },
+    "title": {
+      "en": "Our Location",
+      "ne": "हाम्रो ठेगाना"
+    },
+    "address": {
+      "en": "Address",
+      "ne": "ठेगाना"
+    },
+    "hours": {
+      "en": "Hours",
+      "ne": "खुल्ने समय"
+    },
+    "hoursValue": {
+      "en": "Sun–Fri: 11:00 AM – 8:00 PM",
+      "ne": "आइत–शुक्र: बिहान ११:०० – बेलुका ८:००"
+    },
+    "phone": {
+      "en": "Phone",
+      "ne": "फोन"
+    },
+    "directions": {
+      "en": "Get Directions",
+      "ne": "दिशा हेर्नुहोस्"
+    },
+    "mapTitle": {
+      "en": "Map showing the studio location",
+      "ne": "स्टुडियोको ठेगाना देखाउने नक्सा"
+    }
+  },
+  "footer": {
+    "tagline": {
+      "en": "Dependable plastic and polymer products for homes and industry — manufactured in Bhaktapur, delivered across Nepal.",
+      "ne": "घर तथा उद्योगका लागि भरपर्दो प्लास्टिक र पोलिमर उत्पादन — भक्तपुरमा निर्मित, नेपालभर आपूर्ति।"
+    },
+    "quickLinks": {
+      "en": "QUICK LINKS",
+      "ne": "द्रुत लिंकहरू"
+    },
+    "contact": {
+      "en": "CONTACT",
+      "ne": "सम्पर्क"
+    },
+    "connect": {
+      "en": "CONNECT WITH US",
+      "ne": "हामीसँग जोडिनुहोस्"
+    },
+    "whatsapp": {
+      "en": "Chat on WhatsApp",
+      "ne": "व्हाट्सएपमा कुराकानी गर्नुहोस्"
+    },
+    "cta": {
+      "en": "CONTACT US",
+      "ne": "सम्पर्क गर्नुहोस्"
+    },
+    "rights": {
+      "en": "All rights reserved.",
+      "ne": "सर्वाधिकार सुरक्षित।"
+    },
+    "logoAlt": {
+      "en": "Pashupati Plasto Nepal — plastic manufacturer in Bhaktapur",
+      "ne": "पशुपति प्लास्टो नेपाल — भक्तपुरमा प्लास्टिक निर्माता"
+    }
   }
-  
 }

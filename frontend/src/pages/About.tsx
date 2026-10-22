@@ -1,15 +1,17 @@
-import Navbar from "../features/navbar/navBar";
-import MobileBottomNav from "../features/navbar/MobileBottomNav";
-import { useLanguage } from "../i18n/useLanguage";
-import { motion } from "framer-motion";
+import { useLanguage } from "@/i18n/useLanguage"
+import { motion } from "framer-motion"
+import { PageMeta } from "@/shared/ui/PageMeta"
 
 export default function About() {
-  const { t } = useLanguage();
+  const { t } = useLanguage()
 
   return (
-    <div className="min-h-screen bg-canvas">
-      <Navbar />
-      <main className="flex min-h-screen items-center justify-center px-6 pt-28 pb-20 sm:pt-32 sm:pb-16">
+    <>
+      <PageMeta
+        title={`${t("sections.about.label")} — Pashupati Plasto Nepal`}
+        description={t("sections.about.body")}
+      />
+      <div className="flex min-h-screen items-center justify-center px-6 pt-28 pb-20 sm:pt-32 sm:pb-16">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -25,8 +27,7 @@ export default function About() {
             </p>
           </div>
         </motion.div>
-      </main>
-      <MobileBottomNav />
-    </div>
-  );
+      </div>
+    </>
+  )
 }

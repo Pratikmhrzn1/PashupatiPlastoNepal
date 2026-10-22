@@ -1,10 +1,18 @@
 import { NestFactory } from '@nestjs/core';
-import { AppModule, ObserveInstrument } from './app.module.js';
+import { Logger } from 'nestjs-pino';
+import { AppModule } from './app.module.js';
+import { configureApp } from './app.setup.js';
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule, {
-    instrument: ObserveInstrument,
-  });
-  await app.listen(process.env.PORT ?? 3000);
+  const app = await NestFactory.create(AppModule, { bufferLogs: true });
+  const logger = app.get(Logger);
+  app.useLogger(logger);
+
+  configureApp(app);
+
+  const port = process.env.PORT || 4000;
+  await app.listen(port);
+  logger.log(`Application is running on: http://localhost:${port}${process.env.API_PREFIX || '/api/v1'}`);
 }
-await bootstrap();
+
+void bootstrap();

@@ -1,17 +1,22 @@
-import Navbar from "../features/navbar/navBar";
-import MobileBottomNav from "../features/navbar/MobileBottomNav";
-import { useLanguage } from "../i18n/useLanguage";
-import { motion } from "framer-motion";
-import { ProductsGrid } from "../features/products";
-import { PRODUCTS } from "../constants/products";
+import { useLanguage } from "@/i18n/useLanguage"
+import { motion } from "framer-motion"
+import { PageMeta } from "@/shared/ui/PageMeta"
+import { ProductGridSkeleton } from "@/shared/ui/Skeleton"
+import { ErrorState, EmptyState } from "@/shared/ui/States"
+import { ProductsGrid } from "@/features/products"
+import { useProducts } from "@/features/products/useProducts"
 
 export default function Products() {
-  const { t } = useLanguage();
+  const { t } = useLanguage()
+  const { data: products, isPending, isError, refetch } = useProducts()
 
   return (
-    <div className="min-h-screen bg-canvas">
-      <Navbar />
-      <main className="px-6 pt-28 pb-24 sm:pt-32 sm:pb-20">
+    <>
+      <PageMeta
+        title={`${t("sections.products.label")} — Pashupati Plasto Nepal`}
+        description={t("sections.products.body")}
+      />
+      <div className="px-6 pt-28 pb-24 sm:pt-32 sm:pb-20">
         <motion.div
           initial={{ opacity: 0, y: 12 }}
           animate={{ opacity: 1, y: 0 }}
@@ -26,12 +31,26 @@ export default function Products() {
               {t("sections.products.body")}
             </p>
           </div>
-          <div className="mt-10">
-            <ProductsGrid products={PRODUCTS} />
+          <div className="mt-10" aria-busy={isPending}>
+            {isPending ? (
+              <ProductGridSkeleton />
+            ) : isError ? (
+              <ErrorState
+                title={t("sections.error.label")}
+                description={t("sections.error.body")}
+                onRetry={() => void refetch()}
+              />
+            ) : products && products.length > 0 ? (
+              <ProductsGrid products={products} />
+            ) : (
+              <EmptyState
+                title={t("sections.products.label")}
+                description={t("sections.products.body")}
+              />
+            )}
           </div>
         </motion.div>
-      </main>
-      <MobileBottomNav />
-    </div>
-  );
+      </div>
+    </>
+  )
 }
