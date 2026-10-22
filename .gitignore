@@ -36,3 +36,5 @@ coverage/
 
 # Vite cache
 .vite/
+
+plan.md
