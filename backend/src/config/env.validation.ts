@@ -4,6 +4,7 @@ import {
   IsEmail,
   IsEnum,
   IsIn,
+  IsNotEmpty,
   IsNumber,
   IsOptional,
   IsString,
@@ -30,7 +31,8 @@ class EnvironmentVariables {
   API_PREFIX: string = '/api/v1';
 
   @IsUrl({ require_tld: false })
-  FRONTEND_URL: string;
+  @IsOptional()
+  FRONTEND_URL?: string;
 
   @IsString()
   @IsOptional()
@@ -44,8 +46,30 @@ class EnvironmentVariables {
   @IsOptional()
   COOKIE_SAME_SITE?: 'lax' | 'strict' | 'none';
 
+  @ValidateIf(
+    (env: EnvironmentVariables) =>
+      !env.POSTGRES_PRISMA_URL &&
+      !env.POSTGRES_URL &&
+      !env.POSTGRES_URL_NON_POOLING,
+  )
+  @IsString({
+    message:
+      'DATABASE_URL must be set (or provide POSTGRES_PRISMA_URL / POSTGRES_URL from a Vercel/Neon Postgres integration)',
+  })
+  @IsNotEmpty()
+  DATABASE_URL?: string;
+
   @IsString()
-  DATABASE_URL: string;
+  @IsOptional()
+  POSTGRES_PRISMA_URL?: string;
+
+  @IsString()
+  @IsOptional()
+  POSTGRES_URL?: string;
+
+  @IsString()
+  @IsOptional()
+  POSTGRES_URL_NON_POOLING?: string;
 
   @IsString()
   @IsOptional()
@@ -69,12 +93,15 @@ class EnvironmentVariables {
   @IsString()
   JWT_REFRESH_EXPIRES_IN: string = '7d';
 
+  // Only used by the seed script; not required for the API to boot.
   @IsString()
-  ADMIN_EMAIL: string;
+  @IsOptional()
+  ADMIN_EMAIL?: string;
 
   @IsString()
   @MinLength(8)
-  ADMIN_PASSWORD: string;
+  @IsOptional()
+  ADMIN_PASSWORD?: string;
 
   @IsString()
   @IsOptional()

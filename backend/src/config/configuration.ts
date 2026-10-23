@@ -1,8 +1,10 @@
+import { resolveDatabaseUrl, resolveFrontendUrl } from './runtime-urls.js';
+
 export default () => ({
   nodeEnv: process.env.NODE_ENV,
   port: parseInt(process.env.PORT || '4000', 10),
   apiPrefix: process.env.API_PREFIX || '/api/v1',
-  frontendUrl: process.env.FRONTEND_URL,
+  frontendUrl: resolveFrontendUrl(),
   site: {
     featuredProductLimit: parseInt(
       process.env.FEATURED_PRODUCT_LIMIT || '4',
@@ -10,7 +12,7 @@ export default () => ({
     ),
     publicProductLimit: parseInt(process.env.PUBLIC_PRODUCT_LIMIT || '200', 10),
   },
-  databaseUrl: process.env.DATABASE_URL,
+  databaseUrl: resolveDatabaseUrl(),
   redisUrl: process.env.REDIS_URL,
   jwt: {
     accessSecret: process.env.JWT_ACCESS_SECRET,

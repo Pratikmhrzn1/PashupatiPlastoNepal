@@ -1,4 +1,4 @@
-import argon2 from 'argon2';
+import { hash } from '@node-rs/argon2';
 import {
   generateToken,
   hashPassword,
@@ -71,6 +71,6 @@ describe('crypto.utils', () => {
 
 describe('argon2 configuration', () => {
   it('is installed and functional', () => {
-    expect(typeof argon2.hash).toBe('function');
+    expect(typeof hash).toBe('function');
   });
 });

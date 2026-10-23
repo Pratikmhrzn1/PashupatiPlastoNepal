@@ -1,8 +1,10 @@
-import argon2 from 'argon2';
+import { hash as argon2Hash, verify } from '@node-rs/argon2';
 import { createHash, randomBytes } from 'crypto';
 
+const ARGON2ID = 2; // Algorithm.Argon2id
+
 export async function hashPassword(password: string): Promise<string> {
-  return argon2.hash(password, { type: argon2.argon2id });
+  return argon2Hash(password, { algorithm: ARGON2ID });
 }
 
 export async function verifyPassword(
@@ -10,7 +12,7 @@ export async function verifyPassword(
   password: string,
 ): Promise<boolean> {
   try {
-    return await argon2.verify(hash, password);
+    return await verify(hash, password);
   } catch {
     return false;
   }

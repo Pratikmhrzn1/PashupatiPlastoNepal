@@ -10,6 +10,7 @@ import compression from 'compression';
 import cookieParser from 'cookie-parser';
 import { join } from 'node:path';
 import { AllExceptionsFilter } from './common/filters/http-exception.filter.js';
+import { resolveFrontendUrl } from './config/runtime-urls.js';
 
 /**
  * Routes the frontend calls are under /api (routed by Vercel Services). Everything else lives under `/api/v1`.
@@ -24,6 +25,10 @@ export const PUBLIC_ROOT_ROUTES: { path: string; method: RequestMethod }[] = [
 export function configureApp(app: INestApplication): void {
   const apiPrefix = process.env.API_PREFIX || '/api/v1';
   const expressApp = app as NestExpressApplication;
+
+  // Vercel terminates TLS and proxies requests, so trust its forwarded headers
+  // for correct client IPs (rate limiting) and protocol detection.
+  expressApp.set('trust proxy', 1);
 
   app.setGlobalPrefix(apiPrefix, { exclude: PUBLIC_ROOT_ROUTES });
   app.use(
@@ -42,7 +47,7 @@ export function configureApp(app: INestApplication): void {
   });
 
   const allowedOrigins = [
-    process.env.FRONTEND_URL || 'http://localhost:3000',
+    resolveFrontendUrl(),
     ...(process.env.CORS_ORIGINS?.split(',') ?? []),
   ]
     .map((origin) => origin.trim().replace(/\/$/, ''))

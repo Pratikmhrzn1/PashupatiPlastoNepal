@@ -1,4 +1,8 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  ServiceUnavailableException,
+} from '@nestjs/common';
 import { put } from '@vercel/blob';
 import { mkdir, writeFile } from 'node:fs/promises';
 import { join } from 'node:path';
@@ -59,6 +63,12 @@ export class ProductImagesService {
       });
 
       return blob.url;
+    }
+
+    if (process.env.VERCEL) {
+      throw new ServiceUnavailableException(
+        'Image uploads are not configured. Connect a Vercel Blob store so BLOB_READ_WRITE_TOKEN is available.',
+      );
     }
 
     await mkdir(this.uploadsDir, { recursive: true });

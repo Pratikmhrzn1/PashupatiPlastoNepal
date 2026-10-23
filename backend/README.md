@@ -93,26 +93,40 @@ $ npm run test:cov
 
 ## Deploying to Vercel
 
-The repository is a monorepo with two independently deployable workspaces.
-Create **two Vercel projects from the same Git repository**:
+This repository deploys as **one Vercel project with two Services** (see the
+root `vercel.json`):
 
-| Project | Root Directory | Framework |
+| Service | Root | Framework |
 | --- | --- | --- |
-| Web | `frontend` | Vite |
-| API | `backend` | NestJS (auto-detected) |
+| `web` | `frontend` | Vite |
+| `api` | `backend` | NestJS |
 
-API environment variables (Project → Settings → Environment Variables):
+Public routing sends `/api/*` to the API service and everything else to the web
+service. The API keeps its `/api/v1` prefix and also exposes the public
+`/api/products` and `/api/contacts` routes.
 
-- `DATABASE_URL` - pooled PostgreSQL URL (Neon, Vercel Postgres, etc.)
-- `FRONTEND_URL` - the deployed web origin, used for CORS and email links
-- `CORS_ORIGINS` - optional comma-separated preview origins
-- `COOKIE_SAME_SITE` - defaults to `none` in production when web and API are on different domains
+Required API environment variables (Project → Settings → Environment Variables):
+
+- `DATABASE_URL` - pooled PostgreSQL URL (Neon, Vercel Postgres, etc.). The
+  `POSTGRES_URL` / `POSTGRES_PRISMA_URL` names injected by a Postgres
+  integration are also accepted.
 - `JWT_ACCESS_SECRET`, `JWT_REFRESH_SECRET` - at least 32 characters each
-- `ADMIN_EMAIL`, `ADMIN_PASSWORD`, `MAIL_FROM`
-- `BLOB_READ_WRITE_TOKEN` - from a Vercel Blob store (product image uploads)
+  (`openssl rand -base64 32`). The API will not boot without these.
+- `FRONTEND_URL` - the deployed web origin, used for CORS and email links.
+  Falls back to the Vercel deployment URL when omitted.
+
+Optional API variables:
+
+- `CORS_ORIGINS` - comma-separated extra origins (preview deployments)
+- `COOKIE_SAME_SITE` - `lax` for this same-origin setup
+- `ADMIN_EMAIL`, `ADMIN_PASSWORD`, `MAIL_FROM` - used for seeding/admin mail
+- `BLOB_READ_WRITE_TOKEN` - from a Vercel Blob store (product image uploads;
+  the local filesystem is read-only on Vercel)
 - Any optional values from `.env.example`
 
-Run migrations once against the production database, then seed the admin:
+Apply migrations once against the production database, then seed the admin.
+If your provider gives you both pooled and direct URLs, use the direct one for
+these commands:
 
 ```bash
 $ DATABASE_URL="postgresql://..." npm run db:deploy
@@ -122,9 +136,9 @@ $ DATABASE_URL="postgresql://..." npm run seed
 Web environment variables:
 
 - `VITE_API_MODE=live`
-- `VITE_API_BASE_URL=https://<api-project>.vercel.app`
+- Leave `VITE_API_BASE_URL` unset so the frontend calls the same origin.
 
-After the API is deployed, set the web project's variables and redeploy it.
+Deploy the project, then check `https://<deployment>/api/v1/health`.
 
 ## Observability
 
