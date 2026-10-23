@@ -12,13 +12,24 @@ import { randomUUID } from 'crypto';
 import { Prisma, Product, ProductStatus } from '@prisma/client';
 import { PrismaService } from '../../database/prisma.service.js';
 import { CreateProductDto } from './dto/create-product.dto.js';
-import { AdminQueryProductsDto, QueryProductsDto } from './dto/query-products.dto.js';
+import { AdminQueryProductsDto } from './dto/query-products.dto.js';
 import { UpdateProductDto } from './dto/update-product.dto.js';
+import {
+  formatProductPrice,
+  resolveProductImage,
+} from './product-format.util.js';
+import { getCatalogSoldCount } from './product-catalog.data.js';
 import {
   AdminProductResponse,
   PaginatedProducts,
   ProductResponse,
+  PublicProductResponse,
 } from './product.types.js';
+
+const extractImages = (images: Product['images']): string[] =>
+  Array.isArray(images)
+    ? images.filter((image): image is string => typeof image === 'string')
+    : [];
 
 const toProductResponse = (product: Product): ProductResponse => ({
   id: product.id,
@@ -27,9 +38,8 @@ const toProductResponse = (product: Product): ProductResponse => ({
   description: product.description,
   price: product.price === null ? null : Number(product.price),
   currency: product.currency,
-  images: Array.isArray(product.images)
-    ? product.images.filter((image): image is string => typeof image === 'string')
-    : [],
+  unit: product.unit,
+  images: extractImages(product.images),
   category: product.category,
   status: product.status,
   featured: product.featured,
@@ -48,6 +58,9 @@ export class ProductsService {
   private readonly publicListTtlMs: number;
   private readonly publicDetailTtlMs: number;
   private readonly versionTtlMs: number;
+  private readonly frontendUrl: string | undefined;
+  private readonly publicProductLimit: number;
+  private readonly featuredProductLimit: number;
 
   constructor(
     private readonly prisma: PrismaService,
@@ -58,13 +71,22 @@ export class ProductsService {
       (this.configService.get<number>('cache.productListTtlSeconds') ?? 60) *
       1000;
     this.publicDetailTtlMs =
-      (this.configService.get<number>('cache.productDetailTtlSeconds') ??
-        300) * 1000;
+      (this.configService.get<number>('cache.productDetailTtlSeconds') ?? 300) *
+      1000;
     this.versionTtlMs = 24 * 60 * 60 * 1000;
+    this.frontendUrl = this.configService.get<string>('frontendUrl');
+    this.publicProductLimit =
+      this.configService.get<number>('site.publicProductLimit') ?? 200;
+    this.featuredProductLimit =
+      this.configService.get<number>('site.featuredProductLimit') ?? 4;
   }
 
   private get publicListPrefix() {
     return 'products:public:list';
+  }
+
+  private get publicFeaturedPrefix() {
+    return 'products:public:featured';
   }
 
   private get publicDetailPrefix() {
@@ -86,19 +108,14 @@ export class ProductsService {
     return initial;
   }
 
-  private async buildPublicListKey(query: QueryProductsDto) {
+  private async buildPublicListKey() {
     const version = await this.currentCacheVersion();
-    const key = JSON.stringify({
-      page: query.page,
-      limit: query.limit,
-      category: query.category ?? null,
-      featured: query.featured ?? null,
-      search: query.search ?? null,
-      sort: query.sort,
-      order: query.order,
-    });
+    return `${this.publicListPrefix}:v${version}`;
+  }
 
-    return `${this.publicListPrefix}:v${version}:${key}`;
+  private async buildPublicFeaturedKey() {
+    const version = await this.currentCacheVersion();
+    return `${this.publicFeaturedPrefix}:v${version}`;
   }
 
   private async buildPublicDetailKey(identifier: string) {
@@ -106,72 +123,89 @@ export class ProductsService {
     return `${this.publicDetailPrefix}:v${version}:${identifier}`;
   }
 
-  async findAllPublic(
-    query: QueryProductsDto,
-  ): Promise<PaginatedProducts<ProductResponse>> {
-    const key = await this.buildPublicListKey(query);
-    const cached = await this.cache.get<PaginatedProducts<ProductResponse>>(key);
+  /**
+   * Maps a product row to the wire format the frontend consumes.
+   */
+  private toPublicProductResponse(product: Product): PublicProductResponse {
+    const response: PublicProductResponse = {
+      id: product.id,
+      name: product.name,
+      price: formatProductPrice(
+        product.price === null ? null : Number(product.price),
+        product.currency,
+        product.unit,
+      ),
+      description: product.description ?? '',
+    };
+
+    const image = resolveProductImage(
+      extractImages(product.images),
+      this.frontendUrl,
+    );
+
+    if (image) {
+      response.image = image;
+    }
+
+    const soldCount = getCatalogSoldCount(product.slug);
+
+    if (soldCount !== undefined) {
+      response.soldCount = soldCount;
+    }
+
+    return response;
+  }
+
+  /**
+   * All published products, in catalog order.
+   */
+  async findAllPublic(): Promise<PublicProductResponse[]> {
+    const key = await this.buildPublicListKey();
+    const cached = await this.cache.get<PublicProductResponse[]>(key);
 
     if (cached) {
       return cached;
     }
 
-    const where: Prisma.ProductWhereInput = {
-      status: ProductStatus.ACTIVE,
-      deletedAt: null,
-    };
+    const products = await this.prisma.product.findMany({
+      where: { status: ProductStatus.ACTIVE, deletedAt: null },
+      orderBy: [{ createdAt: 'asc' }, { id: 'asc' }],
+      take: this.publicProductLimit,
+    });
 
-    if (query.category) {
-      where.category = { equals: query.category, mode: 'insensitive' };
-    }
-
-    if (query.featured !== undefined) {
-      where.featured = query.featured;
-    }
-
-    if (query.search) {
-      where.OR = [
-        { name: { contains: query.search, mode: 'insensitive' } },
-        { description: { contains: query.search, mode: 'insensitive' } },
-      ];
-    }
-
-    const orderBy: Prisma.ProductOrderByWithRelationInput = {
-      [query.sort]: query.order,
-    };
-
-    const [total, products] = await this.prisma.$transaction([
-      this.prisma.product.count({ where }),
-      this.prisma.product.findMany({
-        where,
-        orderBy,
-        skip: (query.page - 1) * query.limit,
-        take: query.limit,
-      }),
-    ]);
-
-    const totalPages = Math.ceil(total / query.limit);
-
-    const result: PaginatedProducts<ProductResponse> = {
-      data: products.map((product) => toProductResponse(product)),
-      meta: {
-        page: query.page,
-        limit: query.limit,
-        total,
-        totalPages,
-        hasNextPage: query.page < totalPages,
-        hasPreviousPage: query.page > 1,
-      },
-    };
+    const result = products.map((product) =>
+      this.toPublicProductResponse(product),
+    );
 
     await this.cache.set(key, result, this.publicListTtlMs);
 
     return result;
   }
 
-  async findOnePublic(identifier: string): Promise<ProductResponse> {
+  /**
+   * Best selling products, ranked by the static catalog figures.
+   */
+  async findFeaturedPublic(): Promise<PublicProductResponse[]> {
+    const key = await this.buildPublicFeaturedKey();
+    const cached = await this.cache.get<PublicProductResponse[]>(key);
+
+    if (cached) {
+      return cached;
+    }
+
+    const products = await this.findAllPublic();
+    const result = [...products]
+      .sort((left, right) => (right.soldCount ?? 0) - (left.soldCount ?? 0))
+      .slice(0, this.featuredProductLimit);
+
+    await this.cache.set(key, result, this.publicListTtlMs);
+
+    return result;
+  }
+
+  async findOnePublic(identifier: string): Promise<PublicProductResponse> {
     const key = await this.buildPublicDetailKey(identifier);
-    const cached = await this.cache.get<ProductResponse>(key);
+    const cached = await this.cache.get<PublicProductResponse>(key);
 
     if (cached) {
       return cached;
@@ -194,7 +228,7 @@ export class ProductsService {
       throw new NotFoundException('Product not found');
     }
 
-    const result = toProductResponse(product);
+    const result = this.toPublicProductResponse(product);
 
     await this.cache.set(key, result, this.publicDetailTtlMs);
 
@@ -289,6 +323,7 @@ export class ProductsService {
           description: dto.description ?? null,
           price: dto.price === undefined ? null : dto.price,
           currency: (dto.currency ?? 'NPR').toUpperCase(),
+          unit: dto.unit ?? null,
           images: Array.isArray(dto.images) ? dto.images : [],
           category: dto.category ?? null,
           status: dto.status ?? ProductStatus.DRAFT,
@@ -303,7 +338,10 @@ export class ProductsService {
     return toAdminProductResponse(product);
   }
 
-  async update(id: string, dto: UpdateProductDto): Promise<AdminProductResponse> {
+  async update(
+    id: string,
+    dto: UpdateProductDto,
+  ): Promise<AdminProductResponse> {
     const existing = await this.prisma.product.findUnique({ where: { id } });
 
     if (!existing) {
@@ -337,6 +375,7 @@ export class ProductsService {
           ...(dto.currency !== undefined
             ? { currency: dto.currency.toUpperCase() }
             : {}),
+          ...(dto.unit !== undefined ? { unit: dto.unit } : {}),
           ...(dto.images !== undefined
             ? { images: Array.isArray(dto.images) ? dto.images : [] }
             : {}),
@@ -415,7 +454,9 @@ export class ProductsService {
     }
 
     if (existing.deletedAt) {
-      throw new BadRequestException('Cannot change status of a deleted product');
+      throw new BadRequestException(
+        'Cannot change status of a deleted product',
+      );
     }
 
     const product = await this.prisma.product.update({

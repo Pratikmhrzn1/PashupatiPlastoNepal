@@ -1,19 +1,18 @@
-import {
-  Controller,
-  Get,
-  HttpStatus,
-  Param,
-  Query,
-  Res,
-} from '@nestjs/common';
+import { Controller, Get, HttpStatus, Param, Res } from '@nestjs/common';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
 import { ConfigService } from '@nestjs/config';
 import type { Response } from 'express';
 import { createHash } from 'crypto';
 import { ProductsService } from './products.service.js';
 import { Public } from '../../common/decorators/public.decorator.js';
-import { QueryProductsDto } from './dto/query-products.dto.js';
 
+/**
+ * Public marketing endpoints.
+ *
+ * These are served from the server root (no `/api/v1` prefix) because the
+ * frontend calls them with `VITE_API_BASE_URL` as the base, e.g.
+ * `GET ${base}/products`.
+ */
 @ApiTags('products')
 @Controller('products')
 export class ProductsController {
@@ -32,34 +31,41 @@ export class ProductsController {
 
   @Public()
   @Get()
-  @ApiOperation({ summary: 'List active products (public)' })
-  async findAll(@Query() query: QueryProductsDto, @Res() res: Response) {
-    const result = await this.productsService.findAllPublic(query);
-    const etag = this.generateEtag(result);
+  @ApiOperation({ summary: 'List published products (public)' })
+  async findAll(@Res() res: Response) {
+    const result = await this.productsService.findAllPublic();
 
-    res.setHeader(
-      'Cache-Control',
-      `public, max-age=${this.listMaxAge}, stale-while-revalidate=${this.listMaxAge * 2}`,
-    );
-    res.setHeader('ETag', etag);
+    return this.sendCached(res, result, this.listMaxAge);
+  }
 
-    if (this.etagMatches(res.req.headers['if-none-match'], etag)) {
-      return res.status(HttpStatus.NOT_MODIFIED).send();
-    }
+  @Public()
+  @Get('featured')
+  @ApiOperation({ summary: 'List best selling products (public)' })
+  async findFeatured(@Res() res: Response) {
+    const result = await this.productsService.findFeaturedPublic();
 
-    return res.json(result);
+    return this.sendCached(res, result, this.listMaxAge);
   }
 
   @Public()
   @Get(':idOrSlug')
-  @ApiOperation({ summary: 'Get an active product by ID or slug (public)' })
+  @ApiOperation({ summary: 'Get a published product by ID or slug (public)' })
   async findOne(@Param('idOrSlug') idOrSlug: string, @Res() res: Response) {
     const result = await this.productsService.findOnePublic(idOrSlug);
+
+    return this.sendCached(res, result, this.detailMaxAge);
+  }
+
+  private async sendCached(
+    res: Response,
+    result: unknown,
+    maxAge: number,
+  ): Promise<Response> {
     const etag = this.generateEtag(result);
 
     res.setHeader(
       'Cache-Control',
-      `public, max-age=${this.detailMaxAge}, stale-while-revalidate=${this.detailMaxAge * 2}`,
+      `public, max-age=${maxAge}, stale-while-revalidate=${maxAge * 2}`,
     );
     res.setHeader('ETag', etag);
 
@@ -82,7 +88,9 @@ export class ProductsController {
   }
 
   private generateEtag(data: unknown): string {
-    const hash = createHash('sha256').update(JSON.stringify(data)).digest('hex');
+    const hash = createHash('sha256')
+      .update(JSON.stringify(data))
+      .digest('hex');
     return `W/"${hash}"`;
   }
 }

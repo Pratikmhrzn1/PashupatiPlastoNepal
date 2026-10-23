@@ -1,14 +1,21 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { ConfigService } from '@nestjs/config';
 import { CACHE_MANAGER } from '@nestjs/cache-manager';
-import { BadRequestException, ConflictException, NotFoundException } from '@nestjs/common';
+import {
+  BadRequestException,
+  ConflictException,
+  NotFoundException,
+} from '@nestjs/common';
 import { ProductStatus } from '@prisma/client';
 import { ProductsService } from './products.service.js';
 import { PrismaService } from '../../database/prisma.service.js';
-import { AdminQueryProductsDto, QueryProductsDto } from './dto/query-products.dto.js';
+import { AdminQueryProductsDto } from './dto/query-products.dto.js';
 
 class MemoryCache {
-  private readonly store = new Map<string, { value: unknown; expiresAt: number }>();
+  private readonly store = new Map<
+    string,
+    { value: unknown; expiresAt: number }
+  >();
 
   async get<T>(key: string): Promise<T | undefined> {
     const entry = this.store.get(key);
@@ -44,6 +51,7 @@ const buildProduct = (overrides: Record<string, unknown> = {}) => ({
   description: 'A sturdy chair',
   price: 1999.5,
   currency: 'NPR',
+  unit: 'piece',
   images: ['https://example.com/chair.jpg'],
   category: 'Furniture',
   status: ProductStatus.ACTIVE,
@@ -70,14 +78,6 @@ describe('ProductsService', () => {
     };
     $transaction: ReturnType<typeof vi.fn>;
   };
-
-  const defaultQuery = (): QueryProductsDto =>
-    Object.assign(new QueryProductsDto(), {
-      page: 1,
-      limit: 20,
-      sort: 'createdAt',
-      order: 'desc',
-    });
 
   beforeEach(async () => {
     cache = new MemoryCache();
@@ -108,6 +108,9 @@ describe('ProductsService', () => {
               const values: Record<string, unknown> = {
                 'cache.productListTtlSeconds': 60,
                 'cache.productDetailTtlSeconds': 300,
+                frontendUrl: 'https://pashupati.com.np',
+                'site.featuredProductLimit': 4,
+                'site.publicProductLimit': 200,
               };
               return values[key];
             }),
@@ -121,76 +124,105 @@ describe('ProductsService', () => {
   });
 
   describe('findAllPublic', () => {
-    it('only queries active, non-deleted products with pagination', async () => {
-      const product = buildProduct();
-      prisma.product.count.mockResolvedValue(1);
-      prisma.product.findMany.mockResolvedValue([product]);
-
-      const result = await service.findAllPublic(defaultQuery());
-
-      expect(prisma.product.count).toHaveBeenCalledWith({
-        where: { status: ProductStatus.ACTIVE, deletedAt: null },
-      });
-      expect(prisma.product.findMany).toHaveBeenCalledWith({
-        where: { status: ProductStatus.ACTIVE, deletedAt: null },
-        orderBy: { createdAt: 'desc' },
-        skip: 0,
-        take: 20,
-      });
-      expect(result.data[0]).toMatchObject({
-        id: 'product-1',
-        slug: 'plastic-chair',
-        price: 1999.5,
-      });
-      expect(result.meta).toEqual({
-        page: 1,
-        limit: 20,
-        total: 1,
-        totalPages: 1,
-        hasNextPage: false,
-        hasPreviousPage: false,
-      });
-    });
-
-    it('applies category, featured and search filters', async () => {
-      const query = Object.assign(defaultQuery(), {
-        category: 'Furniture',
-        featured: true,
-        search: 'chair',
-      });
-
-      await service.findAllPublic(query);
-
-      expect(prisma.product.count).toHaveBeenCalledWith({
-        where: {
-          status: ProductStatus.ACTIVE,
-          deletedAt: null,
-          category: { equals: 'Furniture', mode: 'insensitive' },
-          featured: true,
-          OR: [
-            { name: { contains: 'chair', mode: 'insensitive' } },
-            { description: { contains: 'chair', mode: 'insensitive' } },
-          ],
-        },
-      });
-    });
-
-    it('caches identical queries', async () => {
-      prisma.product.count.mockResolvedValue(1);
+    it('only queries active, non-deleted products', async () => {
       prisma.product.findMany.mockResolvedValue([buildProduct()]);
 
-      await service.findAllPublic(defaultQuery());
-      await service.findAllPublic(defaultQuery());
+      const result = await service.findAllPublic();
 
-      expect(prisma.product.count).toHaveBeenCalledTimes(1);
-      expect(prisma.product.findMany).toHaveBeenCalledTimes(1);
+      expect(prisma.product.findMany).toHaveBeenCalledWith({
+        where: { status: ProductStatus.ACTIVE, deletedAt: null },
+        orderBy: [{ createdAt: 'asc' }, { id: 'asc' }],
+        take: 200,
+      });
+      expect(result[0]).toMatchObject({
+        id: 'product-1',
+        name: 'Plastic Chair',
+        price: 'NPR 1999.50 / piece',
+        description: 'A sturdy chair',
+        image: 'https://example.com/chair.jpg',
+      });
     });
 
-    it('uses distinct cache entries for different pages', async () => {
-      await service.findAllPublic(defaultQuery());
-      await service.findAllPublic(Object.assign(defaultQuery(), { page: 2 }));
+    it('returns a plain array without pagination metadata', async () => {
+      prisma.product.findMany.mockResolvedValue([buildProduct()]);
 
-      expect(prisma.product.count).toHaveBeenCalledTimes(2);
+      const result = await service.findAllPublic();
+
+      expect(Array.isArray(result)).toBe(true);
+      expect(result).toHaveLength(1);
+    });
+
+    it('resolves relative images against the frontend origin', async () => {
+      prisma.product.findMany.mockResolvedValue([
+        buildProduct({ images: ['/products/helmet.webp'] }),
+      ]);
+
+      const result = await service.findAllPublic();
+
+      expect(result[0].image).toBe(
+        'https://pashupati.com.np/products/helmet.webp',
+      );
+    });
+
+    it('adds the static catalog sold count when the product is part of it', async () => {
+      prisma.product.findMany.mockResolvedValue([
+        buildProduct({ slug: 'safety-helmets' }),
+      ]);
+
+      const result = await service.findAllPublic();
+
+      expect(result[0].soldCount).toBe(3200);
+    });
+
+    it('omits the sold count for products outside the static catalog', async () => {
+      prisma.product.findMany.mockResolvedValue([buildProduct()]);
+
+      const result = await service.findAllPublic();
+
+      expect(result[0].soldCount).toBeUndefined();
+    });
+
+    it('caches the list until it is invalidated', async () => {
+      prisma.product.findMany.mockResolvedValue([buildProduct()]);
+
+      await service.findAllPublic();
+      await service.findAllPublic();
+
+      expect(prisma.product.findMany).toHaveBeenCalledTimes(1);
+    });
+  });
+
+  describe('findFeaturedPublic', () => {
+    it('ranks products by the static catalog figures', async () => {
+      prisma.product.findMany.mockResolvedValue([
+        buildProduct({ id: 'p1', slug: 'pet-bottles' }),
+        buildProduct({ id: 'p2', slug: 'safety-helmets' }),
+      ]);
+
+      const result = await service.findFeaturedPublic();
+
+      expect(result.map((product) => product.id)).toEqual(['p2', 'p1']);
+      expect(result[0].soldCount).toBe(3200);
+    });
+
+    it('caps the featured list at the configured limit', async () => {
+      prisma.product.findMany.mockResolvedValue([
+        buildProduct({ id: 'p1', slug: 'safety-helmets' }),
+        buildProduct({ id: 'p2', slug: 'oem-pipe-fittings' }),
+        buildProduct({ id: 'p3', slug: 'pipe-clamps' }),
+        buildProduct({ id: 'p4', slug: 'plastic-brick-moulds' }),
+        buildProduct({ id: 'p5', slug: 'pp-woven-sacks' }),
+      ]);
+
+      const result = await service.findFeaturedPublic();
+
+      expect(result).toHaveLength(4);
+      expect(result.map((product) => product.id)).toEqual([
+        'p1',
+        'p2',
+        'p3',
+        'p4',
+      ]);
     });
   });
 
@@ -207,7 +239,13 @@ describe('ProductsService', () => {
           slug: 'plastic-chair',
         },
       });
-      expect(result.slug).toBe('plastic-chair');
+      expect(result).toMatchObject({
+        id: 'product-1',
+        name: 'Plastic Chair',
+        price: 'NPR 1999.50 / piece',
+        description: 'A sturdy chair',
+        image: 'https://example.com/chair.jpg',
+      });
     });
 
     it('finds a product by id when the identifier is a UUID', async () => {
@@ -295,7 +333,9 @@ describe('ProductsService', () => {
       prisma.product.findUnique
         .mockResolvedValueOnce({ id: 'other' })
         .mockResolvedValueOnce(null);
-      prisma.product.create.mockResolvedValue(buildProduct({ slug: 'brown-chair-2' }));
+      prisma.product.create.mockResolvedValue(
+        buildProduct({ slug: 'brown-chair-2' }),
+      );
 
       await service.create({ name: 'Brown Chair' }, 'admin-1');
 
@@ -318,20 +358,27 @@ describe('ProductsService', () => {
       prisma.product.count.mockResolvedValue(0);
       prisma.product.findMany.mockResolvedValue([]);
       prisma.product.findUnique.mockResolvedValue(null);
-      prisma.product.create.mockResolvedValue(buildProduct({ status: ProductStatus.ACTIVE }));
+      prisma.product.create.mockResolvedValue(
+        buildProduct({ status: ProductStatus.ACTIVE }),
+      );
 
-      await service.findAllPublic(defaultQuery());
-      await service.create({ name: 'New Chair', status: ProductStatus.ACTIVE }, 'admin-1');
-      await service.findAllPublic(defaultQuery());
+      await service.findAllPublic();
+      await service.create(
+        { name: 'New Chair', status: ProductStatus.ACTIVE },
+        'admin-1',
+      );
+      await service.findAllPublic();
 
-      expect(prisma.product.count).toHaveBeenCalledTimes(2);
+      expect(prisma.product.findMany).toHaveBeenCalledTimes(2);
     });
   });
 
   describe('update', () => {
     it('updates only the provided fields', async () => {
       prisma.product.findUnique.mockResolvedValue(buildProduct());
-      prisma.product.update.mockResolvedValue(buildProduct({ name: 'New name' }));
+      prisma.product.update.mockResolvedValue(
+        buildProduct({ name: 'New name' }),
+      );
 
       await service.update('product-1', { name: 'New name' });
 
@@ -364,9 +411,9 @@ describe('ProductsService', () => {
     it('throws NotFound for a missing product', async () => {
       prisma.product.findUnique.mockResolvedValue(null);
 
-      await expect(
-        service.update('missing', { name: 'Nope' }),
-      ).rejects.toThrow(NotFoundException);
+      await expect(service.update('missing', { name: 'Nope' })).rejects.toThrow(
+        NotFoundException,
+      );
     });
   });
 

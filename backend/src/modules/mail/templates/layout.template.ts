@@ -12,12 +12,24 @@ export interface LayoutOptions {
   actionLabel?: string;
   actionUrl?: string;
   footnote?: string;
+  /** Overrides the "why you get this email" line at the bottom of the email. */
+  footerNote?: string;
 }
 
 const BRAND = 'Pashupati Plasto';
 
+const ADMIN_FOOTER_NOTE = `You are receiving this email because someone used this address on the ${BRAND} admin panel.`;
+
 export function layout(options: LayoutOptions): string {
-  const { preheader, heading, body, actionLabel, actionUrl, footnote } = options;
+  const {
+    preheader,
+    heading,
+    body,
+    actionLabel,
+    actionUrl,
+    footnote,
+    footerNote = ADMIN_FOOTER_NOTE,
+  } = options;
 
   const button = actionUrl
     ? `<tr>
@@ -75,7 +87,7 @@ export function layout(options: LayoutOptions): string {
             <tr>
               <td style="padding:20px 32px;background:#fafbfc;border-top:1px solid #eceff2;">
                 <p style="margin:0;font-size:12px;line-height:18px;color:#8b93a1;">
-                  You are receiving this email because someone used this address on the ${BRAND} admin panel.
+                  ${footerNote}
                 </p>
               </td>
             </tr>
@@ -88,7 +100,14 @@ export function layout(options: LayoutOptions): string {
 }
 
 export function textLayout(options: LayoutOptions): string {
-  const { heading, body, actionLabel, actionUrl, footnote } = options;
+  const {
+    heading,
+    body,
+    actionLabel,
+    actionUrl,
+    footnote,
+    footerNote = ADMIN_FOOTER_NOTE,
+  } = options;
 
   return [
     heading,
@@ -97,7 +116,7 @@ export function textLayout(options: LayoutOptions): string {
     actionUrl ? `\n${actionLabel ?? 'Open'}: ${actionUrl}` : '',
     footnote ? `\n${footnote}` : '',
     '',
-    `You are receiving this email because someone used this address on the ${BRAND} admin panel.`,
+    footerNote,
   ]
     .filter((line) => line !== undefined)
     .join('\n')

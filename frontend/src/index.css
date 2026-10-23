@@ -117,6 +117,22 @@
     -webkit-text-size-adjust: 100%;
     scroll-behavior: smooth;
     scroll-padding-top: 6rem;
+    text-rendering: optimizeLegibility;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  :focus-visible {
+    outline: 2px solid color-mix(in oklab, var(--color-primary-600) 70%, transparent);
+    outline-offset: 2px;
+  }
+
+  button,
+  [role="button"],
+  input,
+  select,
+  textarea {
+    touch-action: manipulation;
   }
 
   :root {
@@ -163,5 +179,10 @@
 @media (max-width: 768px) {
   body {
     padding-bottom: 64px;
+  }
+
+  /* Admin/login routes have no MobileBottomNav, so the reserve is dead space. */
+  body.admin-route {
+    padding-bottom: 0;
   }
 }

@@ -23,25 +23,61 @@
 
 ## Description
 
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
+Backend for the Pashupati Plasto marketing & contact website.
 
-## Project setup
+## API surface
+
+The frontend calls the API with `VITE_API_BASE_URL` as the base URL, so the
+public marketing routes are served from the server root. Auth and admin routes
+live under `/api/v1`.
+
+**Public (server root)**
+
+| Method | Route | Description |
+| --- | --- | --- |
+| GET | `/products` | All published products, plain array |
+| GET | `/products/featured` | Best sellers, plain array (max `FEATURED_PRODUCT_LIMIT`) |
+| GET | `/products/:idOrSlug` | One product by id or slug, 404 `{ message: "Product not found" }` |
+| POST | `/contacts` | Contact form, answers `201 { ok: true }` |
+
+**Admin (`/api/v1`, cookie auth)**
+
+- `/api/v1/auth/*` - login, logout, refresh, me, verification, password reset
+- `/api/v1/admin/products` - list (paginated/filter/search), create, update,
+  publish, soft delete, hard delete
+- `/api/v1/admin/inquiries` - list, view, update status/note, delete
+- `/api/v1/health` - health check
+
+Swagger UI is available at `/api/docs`.
+
+Product responses are shaped for the frontend:
+`{ id, name, price, description, image?, soldCount? }` where `price` is a
+formatted string (`"NPR 450 / piece"`) and `soldCount` is static catalog data
+(see `src/modules/products/product-catalog.data.ts`).
+
+## Monorepo setup
+
+This app lives in the `pashupati-plasto` npm-workspaces monorepo alongside the
+Vite frontend. Install everything once from the repository root:
 
 ```bash
 $ npm install
 ```
 
-## Compile and run the project
+Then run either workspace from the root:
 
 ```bash
-# development
-$ npm run start
+# both apps
+$ npm run dev
 
-# watch mode
-$ npm run start:dev
+# API only (watch mode)
+$ npm run dev:api
 
-# production mode
-$ npm run start:prod
+# web only
+$ npm run dev:web
+
+# API production build
+$ npm run build:api
 ```
 
 ## Run tests
@@ -57,18 +93,40 @@ $ npm run test:e2e
 $ npm run test:cov
 ```
 
-## Deployment
+## Deploying to Vercel
 
-When you're ready to deploy your NestJS application to production, there are some key steps you can take to ensure it runs as efficiently as possible. Check out the [deployment documentation](https://docs.nestjs.com/deployment) for more information.
+The repository is a monorepo with two independently deployable workspaces.
+Create **two Vercel projects from the same Git repository**:
 
-If you are looking for a cloud-based platform to deploy your NestJS application, check out [Mau](https://mau.nestjs.com), our official platform for deploying NestJS applications on AWS. Mau makes deployment straightforward and fast, requiring just a few simple steps:
+| Project | Root Directory | Framework |
+| --- | --- | --- |
+| Web | `frontend` | Vite |
+| API | `backend` | NestJS (auto-detected) |
+
+API environment variables (Project → Settings → Environment Variables):
+
+- `DATABASE_URL` - pooled PostgreSQL URL (Neon, Vercel Postgres, etc.)
+- `FRONTEND_URL` - the deployed web origin, used for CORS and email links
+- `CORS_ORIGINS` - optional comma-separated preview origins
+- `COOKIE_SAME_SITE` - defaults to `none` in production when web and API are on different domains
+- `JWT_ACCESS_SECRET`, `JWT_REFRESH_SECRET` - at least 32 characters each
+- `ADMIN_EMAIL`, `ADMIN_PASSWORD`, `MAIL_FROM`
+- `BLOB_READ_WRITE_TOKEN` - from a Vercel Blob store (product image uploads)
+- Any optional values from `.env.example`
+
+Run migrations once against the production database, then seed the admin:
 
 ```bash
-$ npm install -g @nestjs/mau
-$ mau deploy
+$ DATABASE_URL="postgresql://..." npm run db:deploy
+$ DATABASE_URL="postgresql://..." npm run seed
 ```
 
-With Mau, you can deploy your application in just a few clicks, allowing you to focus on building features rather than managing infrastructure.
+Web environment variables:
+
+- `VITE_API_MODE=live`
+- `VITE_API_BASE_URL=https://<api-project>.vercel.app`
+
+After the API is deployed, set the web project's variables and redeploy it.
 
 ## Observability
 

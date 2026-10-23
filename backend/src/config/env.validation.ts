@@ -1,5 +1,17 @@
 import { plainToInstance } from 'class-transformer';
-import { IsBooleanString, IsEnum, IsNumber, IsOptional, IsString, IsUrl, MinLength, validateSync } from 'class-validator';
+import {
+  IsBooleanString,
+  IsEmail,
+  IsEnum,
+  IsIn,
+  IsNumber,
+  IsOptional,
+  IsString,
+  IsUrl,
+  MinLength,
+  ValidateIf,
+  validateSync,
+} from 'class-validator';
 
 enum Environment {
   Development = 'development',
@@ -21,11 +33,27 @@ class EnvironmentVariables {
   FRONTEND_URL: string;
 
   @IsString()
+  @IsOptional()
+  BACKEND_PUBLIC_URL?: string;
+
+  @IsString()
+  @IsOptional()
+  CORS_ORIGINS?: string;
+
+  @IsIn(['lax', 'strict', 'none'])
+  @IsOptional()
+  COOKIE_SAME_SITE?: 'lax' | 'strict' | 'none';
+
+  @IsString()
   DATABASE_URL: string;
 
   @IsString()
   @IsOptional()
   REDIS_URL?: string;
+
+  @IsString()
+  @IsOptional()
+  BLOB_READ_WRITE_TOKEN?: string;
 
   @IsString()
   @MinLength(32)
@@ -67,6 +95,10 @@ class EnvironmentVariables {
   @IsOptional()
   TURNSTILE_SECRET_KEY?: string;
 
+  @IsUrl({ require_tld: false })
+  @IsOptional()
+  TURNSTILE_VERIFY_URL?: string;
+
   @IsNumber()
   @IsOptional()
   RATE_LIMIT_TTL?: number = 60;
@@ -86,6 +118,14 @@ class EnvironmentVariables {
   @IsNumber()
   @IsOptional()
   PRODUCT_DETAIL_CACHE_TTL_SECONDS?: number = 300;
+
+  @IsNumber()
+  @IsOptional()
+  FEATURED_PRODUCT_LIMIT?: number = 4;
+
+  @IsNumber()
+  @IsOptional()
+  PUBLIC_PRODUCT_LIMIT?: number = 200;
 
   @IsNumber()
   @IsOptional()
@@ -121,6 +161,23 @@ class EnvironmentVariables {
 
   @IsNumber()
   @IsOptional()
+  INQUIRY_RATE_LIMIT_TTL?: number = 600;
+
+  @IsNumber()
+  @IsOptional()
+  INQUIRY_RATE_LIMIT_LIMIT?: number = 5;
+
+  @ValidateIf((_, value) => value !== undefined && value !== '')
+  @IsEmail()
+  @IsOptional()
+  INQUIRY_NOTIFY_EMAIL?: string;
+
+  @IsBooleanString()
+  @IsOptional()
+  INQUIRY_AUTO_CONFIRM?: string = 'false';
+
+  @IsNumber()
+  @IsOptional()
   EMAIL_VERIFICATION_TTL_HOURS?: number = 24;
 
   @IsNumber()
@@ -133,7 +190,9 @@ export function validate(config: Record<string, unknown>) {
     enableImplicitConversion: true,
   });
 
-  const errors = validateSync(validatedConfig, { skipMissingProperties: false });
+  const errors = validateSync(validatedConfig, {
+    skipMissingProperties: false,
+  });
 
   if (errors.length > 0) {
     throw new Error(errors.toString());

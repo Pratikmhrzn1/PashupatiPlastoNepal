@@ -12,6 +12,7 @@ import { AuthModule } from './modules/auth/auth.module.js';
 import { AdminsModule } from './modules/admins/admins.module.js';
 import { MailModule } from './modules/mail/mail.module.js';
 import { ProductsModule } from './modules/products/products.module.js';
+import { InquiriesModule } from './modules/inquiries/inquiries.module.js';
 import { JwtAuthGuard } from './common/guards/jwt-auth.guard.js';
 import { RolesGuard } from './common/guards/roles.guard.js';
 import { LoggerModule } from 'nestjs-pino';
@@ -54,6 +55,7 @@ import { LoggerModule } from 'nestjs-pino';
     AuthModule,
     AdminsModule,
     ProductsModule,
+    InquiriesModule,
   ],
   controllers: [AppController],
   providers: [

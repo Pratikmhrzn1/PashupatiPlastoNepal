@@ -1,5 +1,19 @@
 import { ProductStatus } from '@prisma/client';
 
+/**
+ * Wire shape consumed by the frontend (`frontend/src/services/types.ts`).
+ * `price` is a pre-formatted string (e.g. "NPR 450 / piece") and `image` is a
+ * single absolute/root-relative URL.
+ */
+export interface PublicProductResponse {
+  id: string;
+  name: string;
+  price: string;
+  description: string;
+  image?: string;
+  soldCount?: number;
+}
+
 export interface ProductResponse {
   id: string;
   name: string;
@@ -7,6 +21,7 @@ export interface ProductResponse {
   description: string | null;
   price: number | null;
   currency: string;
+  unit: string | null;
   images: string[];
   category: string | null;
   status: ProductStatus;

@@ -19,7 +19,7 @@ export class ApiError extends Error {
 interface RequestOptions extends Omit<RequestInit, "body"> {
   body?: unknown;
   /** Query string params. Undefined values are omitted. */
-  params?: Record<string, string | number | undefined>;
+  params?: Record<string, string | number | boolean | undefined>;
 }
 
 /**
@@ -42,6 +42,8 @@ export async function http<T>(path: string, options: RequestOptions = {}): Promi
   let response: Response;
   try {
     response = await fetch(url.toString(), {
+      // Admin auth uses httpOnly cookies, which must be sent with the request.
+      credentials: "include",
       ...rest,
       headers: {
         Accept: "application/json",

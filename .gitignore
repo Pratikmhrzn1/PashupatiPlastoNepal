@@ -37,4 +37,9 @@ coverage/
 # Vite cache
 .vite/
 
-plan.md
+# Vercel
+.vercel
+
+docs/plan.md
+# Uploaded product images
+uploads/

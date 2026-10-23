@@ -2,7 +2,8 @@
 // learn more about it in the docs: https://pris.ly/d/prisma-schema
 
 generator client {
-  provider = "prisma-client-js"
+  provider      = "prisma-client-js"
+  binaryTargets = ["native", "rhel-openssl-3.0.x"]
 }
 
 datasource db {
@@ -96,6 +97,7 @@ model Product {
   description String?       @db.Text
   price       Decimal?      @db.Decimal(10, 2)
   currency    String        @default("NPR")
+  unit        String?
   images      Json          @default("[]")
   category    String?
   status      ProductStatus @default(DRAFT)
@@ -137,6 +139,8 @@ model Inquiry {
   @@index([status])
   @@index([createdAt])
   @@index([email])
+  @@index([status, createdAt])
+  @@index([productId])
 }
 
 model AuditLog {

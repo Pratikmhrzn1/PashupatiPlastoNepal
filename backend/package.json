@@ -1,5 +1,5 @@
 {
-  "name": "backend",
+  "name": "@pashupati/api",
   "version": "0.0.1",
   "description": "",
   "author": "",
@@ -7,7 +7,7 @@
   "license": "UNLICENSED",
   "type": "module",
   "scripts": {
-    "build": "nest build",
+    "build": "prisma generate && nest build",
     "deploy": "nest deploy",
     "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
     "start": "nest start",
@@ -40,6 +40,7 @@
     "@nestjs/terminus": "^12.1.0",
     "@nestjs/throttler": "^6.7.1",
     "@prisma/client": "^6.4.1",
+    "@vercel/blob": "^2.8.2",
     "argon2": "^0.45.1",
     "cache-manager": "^7.2.9",
     "class-transformer": "^0.5.1",

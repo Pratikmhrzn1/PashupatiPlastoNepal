@@ -1,0 +1,30 @@
+{
+  "name": "pashupati-plasto",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Pashupati Plasto monorepo: marketing site, admin dashboard and API.",
+  "workspaces": [
+    "frontend",
+    "backend"
+  ],
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "dev": "concurrently -n web,api -c cyan,green \"npm:dev:web\" \"npm:dev:api\"",
+    "dev:web": "npm run dev --workspace @pashupati/web",
+    "dev:api": "npm run start:dev --workspace @pashupati/api",
+    "build": "npm run build:web && npm run build:api",
+    "build:web": "npm run build --workspace @pashupati/web",
+    "build:api": "npm run build --workspace @pashupati/api",
+    "lint": "npm run lint --workspace @pashupati/web && npm run lint --workspace @pashupati/api",
+    "test": "npm run test --workspace @pashupati/web && npm run test --workspace @pashupati/api",
+    "db:deploy": "npm run db:deploy --workspace @pashupati/api",
+    "db:migrate": "npm run db:migrate --workspace @pashupati/api",
+    "db:studio": "npm run db:studio --workspace @pashupati/api",
+    "seed": "npm run seed --workspace @pashupati/api"
+  },
+  "devDependencies": {
+    "concurrently": "^10.0.6"
+  }
+}

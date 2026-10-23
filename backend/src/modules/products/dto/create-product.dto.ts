@@ -7,7 +7,6 @@ import {
   IsNumber,
   IsOptional,
   IsString,
-  IsUrl,
   Matches,
   MaxLength,
   Min,
@@ -51,12 +50,26 @@ export class CreateProductDto {
   @MaxLength(3)
   currency?: string;
 
-  @ApiPropertyOptional({ type: [String] })
+  @ApiPropertyOptional({
+    type: [String],
+    description:
+      'Absolute URLs or root-relative paths (e.g. "/products/helmet.webp").',
+  })
   @IsOptional()
   @IsArray()
   @ArrayMaxSize(20)
-  @IsUrl({}, { each: true })
+  @IsString({ each: true })
+  @MaxLength(2048, { each: true })
   images?: string[];
+
+  @ApiPropertyOptional({
+    maxLength: 20,
+    description: 'Selling unit, e.g. "piece", "meter", "kg".',
+  })
+  @IsOptional()
+  @IsString()
+  @MaxLength(20)
+  unit?: string;
 
   @ApiPropertyOptional({ maxLength: 100 })
   @IsOptional()

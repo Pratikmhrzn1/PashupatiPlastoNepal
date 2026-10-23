@@ -1,6 +1,7 @@
 import { createBrowserRouter } from "react-router-dom";
 import Layout from "./Layout";
 import { RouteError } from "@/shared/ui/RouteError";
+import { RequireAdmin } from "@/features/admin";
 import { routeLoaders, getRouteLoader } from "./routes";
 
 /**
@@ -47,6 +48,27 @@ export const router = createBrowserRouter([
         lazy: async () => {
           const mod = await import("@/shared/ui/NotFound");
           return { Component: mod.default };
+        },
+      },
+    ],
+  },
+  {
+    path: "/login-admin",
+    lazy: async () => {
+      const mod = await getRouteLoader("/login-admin")();
+      return { Component: (mod as { default: React.ComponentType }).default };
+    },
+    errorElement: <RouteError />,
+  },
+  {
+    element: <RequireAdmin />,
+    errorElement: <RouteError />,
+    children: [
+      {
+        path: "/admin",
+        lazy: async () => {
+          const mod = await getRouteLoader("/admin")();
+          return { Component: (mod as { default: React.ComponentType }).default };
         },
       },
     ],
