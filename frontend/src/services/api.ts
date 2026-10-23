@@ -25,15 +25,15 @@ import type {
  */
 
 export function getProducts(): Promise<ProductDto[]> {
-  return http<ProductDto[]>("/products");
+  return http<ProductDto[]>("/api/products");
 }
 
 export function getProduct(id: string): Promise<ProductDto> {
-  return http<ProductDto>(`/products/${id}`);
+  return http<ProductDto>(`/api/products/${id}`);
 }
 
 export function getFeaturedProducts(): Promise<ProductDto[]> {
-  return http<ProductDto[]>("/products/featured");
+  return http<ProductDto[]>("/api/products/featured");
 }
 
 export function getMembers(): Promise<MemberDto[]> {
@@ -41,7 +41,7 @@ export function getMembers(): Promise<MemberDto[]> {
 }
 
 export function submitContact(payload: ContactPayload): Promise<ContactResponse> {
-  return http<ContactResponse>("/contacts", { method: "POST", body: payload });
+  return http<ContactResponse>("/api/contacts", { method: "POST", body: payload });
 }
 
 /* -------------------------------------------------------------------------- */

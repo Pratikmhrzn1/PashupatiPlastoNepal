@@ -32,6 +32,8 @@ export const env = {
 /** True when the app should intercept requests with MSW. */
 export const isMockMode = () => env.VITE_API_MODE === "mock";
 
-/** Base URL for the real API (undefined in mock mode). */
+/** Base URL for the real API (same-origin in single-project deployment). */
 export const apiBaseUrl = () =>
-  env.VITE_API_MODE === "live" ? (env.VITE_API_BASE_URL ?? "/api") : "/api";
+  env.VITE_API_MODE === "live"
+    ? (env.VITE_API_BASE_URL?.replace(/\/$/, "") ?? "")
+    : "";

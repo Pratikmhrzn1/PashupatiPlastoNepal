@@ -9,12 +9,12 @@ import { Public } from '../../common/decorators/public.decorator.js';
 /**
  * Public marketing endpoints.
  *
- * These are served from the server root (no `/api/v1` prefix) because the
- * frontend calls them with `VITE_API_BASE_URL` as the base, e.g.
- * `GET ${base}/products`.
+ * Public marketing endpoints.
+ *
+ * Routed under /api via Vercel Services (single project).
  */
 @ApiTags('products')
-@Controller('products')
+@Controller('api/products')
 export class ProductsController {
   private readonly listMaxAge: number;
   private readonly detailMaxAge: number;

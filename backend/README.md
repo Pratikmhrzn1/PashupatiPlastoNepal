@@ -27,18 +27,16 @@ Backend for the Pashupati Plasto marketing & contact website.
 
 ## API surface
 
-The frontend calls the API with `VITE_API_BASE_URL` as the base URL, so the
-public marketing routes are served from the server root. Auth and admin routes
-live under `/api/v1`.
+The frontend calls the API with `VITE_API_BASE_URL` as the base URL. Public marketing routes live under `/api`, and auth/admin routes live under `/api/v1`.
 
-**Public (server root)**
+**Public (/api)**
 
 | Method | Route | Description |
 | --- | --- | --- |
-| GET | `/products` | All published products, plain array |
-| GET | `/products/featured` | Best sellers, plain array (max `FEATURED_PRODUCT_LIMIT`) |
-| GET | `/products/:idOrSlug` | One product by id or slug, 404 `{ message: "Product not found" }` |
-| POST | `/contacts` | Contact form, answers `201 { ok: true }` |
+| GET | `/api/products` | All published products, plain array |
+| GET | `/api/products/featured` | Best sellers, plain array (max `FEATURED_PRODUCT_LIMIT`) |
+| GET | `/api/products/:idOrSlug` | One product by id or slug, 404 `{ message: "Product not found" }` |
+| POST | `/api/contacts` | Contact form, answers `201 { ok: true }` |
 
 **Admin (`/api/v1`, cookie auth)**
 

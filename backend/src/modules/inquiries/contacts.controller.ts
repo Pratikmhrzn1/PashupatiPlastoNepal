@@ -18,11 +18,10 @@ import { InquiriesService } from './inquiries.service.js';
 /**
  * Public contact endpoint.
  *
- * Served from the server root (no `/api/v1` prefix) because the frontend posts
- * to `${VITE_API_BASE_URL}/contacts` and expects `{ ok: true }` with 201.
+ * Routed under /api via Vercel Services (single project). Frontend posts to `${VITE_API_BASE_URL}/api/contacts` and expects `{ ok: true }` with 201.
  */
 @ApiTags('contacts')
-@Controller('contacts')
+@Controller('api/contacts')
 export class ContactsController {
   constructor(private readonly inquiriesService: InquiriesService) {}
 

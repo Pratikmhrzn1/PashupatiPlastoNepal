@@ -12,14 +12,13 @@ import { join } from 'node:path';
 import { AllExceptionsFilter } from './common/filters/http-exception.filter.js';
 
 /**
- * Routes the frontend calls with `VITE_API_BASE_URL` as the base URL.
- * They stay on the server root, everything else lives under `/api/v1`.
+ * Routes the frontend calls are under /api (routed by Vercel Services). Everything else lives under `/api/v1`.
  */
 export const PUBLIC_ROOT_ROUTES: { path: string; method: RequestMethod }[] = [
-  { path: 'products', method: RequestMethod.GET },
-  { path: 'products/featured', method: RequestMethod.GET },
-  { path: 'products/:idOrSlug', method: RequestMethod.GET },
-  { path: 'contacts', method: RequestMethod.POST },
+  { path: 'api/products', method: RequestMethod.GET },
+  { path: 'api/products/featured', method: RequestMethod.GET },
+  { path: 'api/products/:idOrSlug', method: RequestMethod.GET },
+  { path: 'api/contacts', method: RequestMethod.POST },
 ];
 
 export function configureApp(app: INestApplication): void {

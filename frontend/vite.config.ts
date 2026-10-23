@@ -49,7 +49,9 @@ export default defineConfig({
           {
             // API GETs: serve cached instantly, refresh in background.
             urlPattern: ({ url, request }) =>
-              request.method === "GET" && url.pathname.startsWith("/api/"),
+              request.method === "GET" &&
+              (url.pathname.startsWith("/api/products") ||
+                url.pathname.startsWith("/api/members")),
             handler: "StaleWhileRevalidate",
             options: {
               cacheName: "api-cache",

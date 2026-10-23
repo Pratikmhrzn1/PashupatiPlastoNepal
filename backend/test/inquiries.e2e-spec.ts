@@ -88,7 +88,7 @@ describe('Inquiries (e2e)', () => {
   describe('POST /contacts (public, frontend contract)', () => {
     it('accepts the frontend payload and answers with { ok: true }', async () => {
       const response = await request(app.getHttpServer())
-        .post('/contacts')
+        .post('/api/contacts')
         .send(contactPayload)
         .expect(201);
 
@@ -105,7 +105,7 @@ describe('Inquiries (e2e)', () => {
 
     it('stores a default subject when none is given', async () => {
       await request(app.getHttpServer())
-        .post('/contacts')
+        .post('/api/contacts')
         .send(contactPayload)
         .expect(201);
 
@@ -118,7 +118,7 @@ describe('Inquiries (e2e)', () => {
 
     it('stores an empty phone as null', async () => {
       await request(app.getHttpServer())
-        .post('/contacts')
+        .post('/api/contacts')
         .send({ ...contactPayload, phone: '' })
         .expect(201);
 
@@ -131,7 +131,7 @@ describe('Inquiries (e2e)', () => {
 
     it('never returns internal fields to the visitor', async () => {
       const response = await request(app.getHttpServer())
-        .post('/contacts')
+        .post('/api/contacts')
         .send(contactPayload)
         .expect(201);
 
@@ -142,28 +142,28 @@ describe('Inquiries (e2e)', () => {
 
     it('rejects an invalid email address', async () => {
       await request(app.getHttpServer())
-        .post('/contacts')
+        .post('/api/contacts')
         .send({ ...contactPayload, email: 'not-an-email' })
         .expect(400);
     });
 
     it('rejects a missing message', async () => {
       await request(app.getHttpServer())
-        .post('/contacts')
+        .post('/api/contacts')
         .send({ ...contactPayload, message: '' })
         .expect(400);
     });
 
     it('rejects unknown fields', async () => {
       await request(app.getHttpServer())
-        .post('/contacts')
+        .post('/api/contacts')
         .send({ ...contactPayload, status: 'REPLIED' })
         .expect(400);
     });
 
     it('drops honeypot submissions without storing them', async () => {
       const response = await request(app.getHttpServer())
-        .post('/contacts')
+        .post('/api/contacts')
         .send({ ...contactPayload, website: 'http://spam.example' })
         .expect(201);
 
@@ -173,7 +173,7 @@ describe('Inquiries (e2e)', () => {
 
     it('strips markup from the stored message', async () => {
       await request(app.getHttpServer())
-        .post('/contacts')
+        .post('/api/contacts')
         .send({ ...contactPayload, message: '<script>alert(1)</script>Hello' })
         .expect(201);
 
@@ -377,12 +377,12 @@ describe('Inquiries (e2e)', () => {
 
       try {
         await request(app.getHttpServer())
-          .post('/contacts')
+          .post('/api/contacts')
           .send(validInquiry)
           .expect(201);
 
         await request(app.getHttpServer())
-          .post('/contacts')
+          .post('/api/contacts')
           .send(validInquiry)
           .expect(429);
       } finally {
