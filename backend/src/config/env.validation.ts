@@ -81,7 +81,8 @@ class EnvironmentVariables {
   RESEND_API_KEY?: string;
 
   @IsString()
-  MAIL_FROM: string;
+  @IsOptional()
+  MAIL_FROM?: string;
 
   @IsString()
   @IsOptional()

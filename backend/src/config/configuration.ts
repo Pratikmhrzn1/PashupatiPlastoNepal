@@ -24,7 +24,7 @@ export default () => ({
   },
   mail: {
     resendApiKey: process.env.RESEND_API_KEY,
-    from: process.env.MAIL_FROM,
+    from: process.env.MAIL_FROM || 'no-reply@localhost',
     fromName: process.env.MAIL_FROM_NAME,
   },
   rateLimit: {
