@@ -6,9 +6,9 @@ import { FiArrowRight } from "react-icons/fi";
 import { useLanguage } from "@/i18n/useLanguage";
 import { SPRING } from "@/lib/motion";
 import ProductCard from "./ProductCard";
-import { useFeaturedProducts } from "./useFeaturedProducts";
+import { FEATURED_PRODUCTS } from "./catalog";
 import { ProductGridSkeleton } from "@/shared/ui/Skeleton";
-import { EmptyState, ErrorState } from "@/shared/ui/States";
+import { EmptyState } from "@/shared/ui/States";
 
 /** Section enters as semantic chunks ~100ms apart: eyebrow → heading → cards → CTA. */
 const sectionStagger: Variants = {
@@ -26,7 +26,13 @@ export default function FeaturedProducts() {
   const reduceMotion = useReducedMotion();
   const sectionRef = useRef<HTMLElement | null>(null);
   const [inView, setInView] = useState(false);
-  const { data: products, isPending, isError, refetch } = useFeaturedProducts();
+  const [isPending, setIsPending] = useState(true);
+  const products = FEATURED_PRODUCTS;
+
+  useEffect(() => {
+    const timeout = window.setTimeout(() => setIsPending(false), 200);
+    return () => window.clearTimeout(timeout);
+  }, []);
 
   useEffect(() => {
     const el = sectionRef.current;
@@ -81,17 +87,10 @@ export default function FeaturedProducts() {
 
         {isPending ? (
           <ProductGridSkeleton count={4} />
-        ) : isError ? (
-          <ErrorState
-            title={t("sections.error.label")}
-            description={t("sections.error.body")}
-            onRetry={() => void refetch()}
-          />
-        ) : products && products.length > 0 ? (
+        ) : products.length > 0 ? (
           <motion.div
             variants={cardRowStagger}
             className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4"
-            aria-busy={isPending}
           >
             {products.map((product) => (
               <motion.div key={product.id} variants={chunk} className="h-full">
