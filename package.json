@@ -11,7 +11,6 @@
     "node": ">=22"
   },
   "scripts": {
-    "postinstall": "prisma generate --schema=backend/prisma/schema.prisma",
     "dev": "concurrently -n web,api -c cyan,green \"npm:dev:web\" \"npm:dev:api\"",
     "dev:web": "npm run dev --workspace @pashupati/web",
     "dev:api": "npm run start:dev --workspace @pashupati/api",
