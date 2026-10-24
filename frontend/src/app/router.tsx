@@ -1,7 +1,6 @@
 import { createBrowserRouter } from "react-router-dom";
 import Layout from "./Layout";
 import { RouteError } from "@/shared/ui/RouteError";
-import { RequireAdmin } from "@/features/admin";
 import { routeLoaders, getRouteLoader } from "./routes";
 
 /**
@@ -52,6 +51,7 @@ export const router = createBrowserRouter([
       },
     ],
   },
+  /*
   {
     path: "/login-admin",
     lazy: async () => {
@@ -73,6 +73,7 @@ export const router = createBrowserRouter([
       },
     ],
   },
+  */
 ]);
 
 export { routeLoaders };

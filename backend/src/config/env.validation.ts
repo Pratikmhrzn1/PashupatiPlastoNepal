@@ -125,6 +125,7 @@ class EnvironmentVariables {
   @IsOptional()
   TURNSTILE_SECRET_KEY?: string;
 
+  @ValidateIf((_, value) => value !== undefined && value !== '')
   @IsUrl({ require_tld: false })
   @IsOptional()
   TURNSTILE_VERIFY_URL?: string;

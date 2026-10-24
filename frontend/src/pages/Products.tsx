@@ -1,14 +1,21 @@
+import { useEffect, useState } from "react"
 import { useLanguage } from "@/i18n/useLanguage"
 import { motion } from "framer-motion"
 import { PageMeta } from "@/shared/ui/PageMeta"
 import { ProductGridSkeleton } from "@/shared/ui/Skeleton"
-import { ErrorState, EmptyState } from "@/shared/ui/States"
+import { EmptyState } from "@/shared/ui/States"
 import { ProductsGrid } from "@/features/products"
-import { useProducts } from "@/features/products/useProducts"
+import { PRODUCTS } from "@/features/products/catalog"
 
 export default function Products() {
   const { t } = useLanguage()
-  const { data: products, isPending, isError, refetch } = useProducts()
+  const [isPending, setIsPending] = useState(true)
+  const products = PRODUCTS
+
+  useEffect(() => {
+    const timeout = window.setTimeout(() => setIsPending(false), 200)
+    return () => window.clearTimeout(timeout)
+  }, [])
 
   return (
     <>
@@ -31,16 +38,10 @@ export default function Products() {
               {t("sections.products.body")}
             </p>
           </div>
-          <div className="mt-10" aria-busy={isPending}>
+          <div className="mt-10">
             {isPending ? (
               <ProductGridSkeleton />
-            ) : isError ? (
-              <ErrorState
-                title={t("sections.error.label")}
-                description={t("sections.error.body")}
-                onRetry={() => void refetch()}
-              />
-            ) : products && products.length > 0 ? (
+            ) : products.length > 0 ? (
               <ProductsGrid products={products} />
             ) : (
               <EmptyState

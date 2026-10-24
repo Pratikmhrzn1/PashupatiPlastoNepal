@@ -9,8 +9,8 @@ export const routeLoaders: Record<string, () => Promise<unknown>> = {
   "/about": () => import("@/pages/About"),
   "/products": () => import("@/pages/Products"),
   "/contact": () => import("@/pages/Contact"),
-  "/login-admin": () => import("@/pages/LoginAdmin"),
-  "/admin": () => import("@/pages/Admin"),
+  // "/login-admin": () => import("@/pages/LoginAdmin"),
+  // "/admin": () => import("@/pages/Admin"),
 };
 
 /** Type-safe accessor: returns the loader or throws if the path isn't registered. */
