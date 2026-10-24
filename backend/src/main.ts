@@ -18,4 +18,8 @@ async function bootstrap() {
   logger.log(`Application is running on: http://localhost:${port}${process.env.API_PREFIX || '/api/v1'}`);
 }
 
-void bootstrap();
+bootstrap().catch((err) => {
+  // Ensure fatal startup crashes are logged with full stack traces in production (e.g. Vercel)
+  console.error('Fatal bootstrap error:', err);
+  process.exit(1);
+});
