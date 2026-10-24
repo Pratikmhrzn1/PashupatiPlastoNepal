@@ -31,8 +31,10 @@ export function configureApp(app: INestApplication): void {
   expressApp.set('trust proxy', 1);
 
   app.setGlobalPrefix(apiPrefix, { exclude: PUBLIC_ROOT_ROUTES });
+  // @ts-ignore - ESM/CJS compatibility for helmet
+  const helmetMiddleware: any = helmet;
   app.use(
-    helmet({
+    helmetMiddleware({
       crossOriginResourcePolicy: { policy: 'cross-origin' },
     }),
   );
