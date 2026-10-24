@@ -30,11 +30,13 @@ class EnvironmentVariables {
   @IsString()
   API_PREFIX: string = '/api/v1';
 
-  @IsUrl({ require_tld: false })
+  @ValidateIf((_, value) => Boolean(value && String(value).trim() !== ''))
+  @IsUrl({ require_tld: false, require_protocol: false })
   @IsOptional()
   FRONTEND_URL?: string;
 
-  @IsString()
+  @ValidateIf((_, value) => Boolean(value && String(value).trim() !== ''))
+  @IsUrl({ require_tld: false, require_protocol: false })
   @IsOptional()
   BACKEND_PUBLIC_URL?: string;
 

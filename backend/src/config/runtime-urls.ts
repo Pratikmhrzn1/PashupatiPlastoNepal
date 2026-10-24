@@ -5,8 +5,11 @@
  * host so a missing variable does not take the API down (CORS, email links).
  */
 export function resolveFrontendUrl(): string {
-  const configured = process.env.FRONTEND_URL?.trim();
+  let configured = process.env.FRONTEND_URL?.trim();
   if (configured) {
+    if (!configured.startsWith('http://') && !configured.startsWith('https://')) {
+      configured = `https://${configured}`;
+    }
     return configured.replace(/\/$/, '');
   }
 
@@ -16,7 +19,7 @@ export function resolveFrontendUrl(): string {
     return `https://${vercelHost.replace(/^https?:\/\//, '').replace(/\/$/, '')}`;
   }
 
-  return 'http://localhost:3000';
+  return 'http://localhost:5173';
 }
 
 /**

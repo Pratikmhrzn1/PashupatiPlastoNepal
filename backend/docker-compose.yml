@@ -31,11 +31,11 @@ services:
 
   api:
     build:
-      context: ..
-      dockerfile: backend/Dockerfile
+      context: .
+      dockerfile: Dockerfile
       target: development
     container_name: pashupati_api
-    working_dir: /app/backend
+    working_dir: /app
     env_file:
       - .env
     environment:
@@ -50,7 +50,7 @@ services:
       redis:
         condition: service_healthy
     volumes:
-      - ..:/app
+      - .:/app
       - /app/node_modules
     command: sh -c "npx prisma migrate deploy && npm run start:dev"
 
